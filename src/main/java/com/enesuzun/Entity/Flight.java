@@ -1,9 +1,10 @@
-package com.enesuzun.entity;
+package com.enesuzun.Entity;
 
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Entity
 @Table(name = "flight")
