@@ -12,8 +12,7 @@ import java.util.List;
 
 @ApplicationScoped
 public class FlightRepository implements PanacheRepository<Flight> {
-    //PanacheRepository ile basit CRUD işlemleri gerçekleşiyor zaten 
-    // Özel sorgular ekleyebilirsin, örnek:
+    //PanacheRepository ile basit CRUD işlemleri gerçekleşiyor zaten özel sorguları yazmak gerekli
     public Flight findByFlightNumber(String flightNumber) {
         return find("flightNumber", flightNumber).firstResult();
     }

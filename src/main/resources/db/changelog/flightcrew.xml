@@ -10,15 +10,16 @@
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="crew_name" type="VARCHAR(100)">
+            <column name="crew_name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="crew_type" type="VARCHAR(50)"/>
+            <column name="crew_type" type="VARCHAR(255)"/>
             <column name="flight_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
         </createTable>
-
+        <createSequence sequenceName="flight_SEQ" startValue="1" incrementBy="50"/>
+        <createSequence sequenceName="flight_crew_SEQ" startValue="1" incrementBy="50"/>
         <!-- Foreign key constraint ayrı olarak tanımlanır -->
         <addForeignKeyConstraint
                 baseTableName="flight_crew"

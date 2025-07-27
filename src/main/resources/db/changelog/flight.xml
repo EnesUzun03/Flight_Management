@@ -10,7 +10,7 @@
             <column name="id" type="BIGINT" autoIncrement="true">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
-            <column name="flight_number" type="VARCHAR(50)">
+            <column name="flight_number" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
             <column name="departure_time" type="TIME">
@@ -20,5 +20,7 @@
                 <constraints nullable="true"/>
             </column>
         </createTable>
+        <createSequence sequenceName="flight_SEQ" startValue="1" incrementBy="50"/>
+        <createSequence sequenceName="flight_crew_SEQ" startValue="1" incrementBy="50"/>
     </changeSet>
 </databaseChangeLog>

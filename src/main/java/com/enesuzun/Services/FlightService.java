@@ -3,20 +3,23 @@ package com.enesuzun.Services;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 import com.enesuzun.Entity.Flight;
 import com.enesuzun.Entity.FlightCrew;
-
-
+import com.enesuzun.Repositories.FlightCrewRepository;
 import com.enesuzun.Repositories.FlightRepository;
+
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
-import java.util.List;
 
 @ApplicationScoped
 public class FlightService {
     @Inject
     FlightRepository flightRepository;
+
+    @Inject
+    FlightCrewRepository flightCrewRepository;
 
     //uçuş ekle
     public void addFlight(Flight flight){
@@ -29,7 +32,7 @@ public class FlightService {
        flight.setFlightNumber(flightNumber);
        flight.setDepartureTime(departureTime);
        flight.setDepartureDate(departureDate);
-       flight.setflightCrews(flightCrews);
+       flight.setFlightCrews(flightCrews);
 
        flightRepository.persist(flight);
 
@@ -76,5 +79,14 @@ public class FlightService {
     //uçuştaki personel listesini bulma
     public List<FlightCrew> findByFlightCrewList(Flight flight){
         return flightRepository.findByFlightCrewList(flight.flightNumber);
+    }
+
+    // Flight entity'sine crew ekle
+    public void addCrewToFlight(Long flightId, FlightCrew crew) {
+        Flight flight = flightRepository.findById(flightId);
+        if (flight != null) {
+            crew.flight = flight;
+            flightCrewRepository.persist(crew);
+        }
     }
 }

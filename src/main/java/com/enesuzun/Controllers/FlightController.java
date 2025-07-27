@@ -3,6 +3,7 @@ package com.enesuzun.Controllers;
 import java.util.List;
 
 import com.enesuzun.Entity.Flight;
+import com.enesuzun.Entity.FlightCrew;
 import com.enesuzun.Services.FlightService;
 
 import jakarta.inject.Inject;
@@ -70,5 +71,13 @@ public class FlightController {
         }
         flightService.deleteFlight(id);
         return Response.noContent().build();
+    }
+
+    // Flight entity'sine crew ekle
+    @POST
+    @Path("/{flightId}/add-crew")
+    public Response addCrewToFlight(@PathParam("flightId") Long flightId, FlightCrew crew) {
+        flightService.addCrewToFlight(flightId, crew);
+        return Response.status(Response.Status.CREATED).entity(crew).build();
     }
 }

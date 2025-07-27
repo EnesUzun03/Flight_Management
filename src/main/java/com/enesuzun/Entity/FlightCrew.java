@@ -14,8 +14,8 @@ public class FlightCrew extends PanacheEntity {
     
     @Enumerated(EnumType.STRING)
     @Column(name = "crew_type")
-    public CrewType crewType;  // Cabin/Cockpit gibi personel tipi
-    
+    public CrewType crewType;  //PILOT,COPILOT,CABIN_CREW gibi personel tipi
+
     @ManyToOne
     @JoinColumn(name = "flight_id")
     public Flight flight;
