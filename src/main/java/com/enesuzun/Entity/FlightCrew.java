@@ -1,9 +1,13 @@
 package com.enesuzun.Entity;
 
-
 import io.quarkus.hibernate.orm.panache.PanacheEntity;
-import jakarta.persistence.*;
-
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "flight_crew")

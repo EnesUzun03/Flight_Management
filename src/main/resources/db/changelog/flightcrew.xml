@@ -6,8 +6,11 @@
     http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
     <changeSet id="2" author="enes">
+        <!-- Sequence oluştur -->
+        <createSequence sequenceName="flight_crew_SEQ" startValue="1" incrementBy="1"/>
+        
         <createTable tableName="flight_crew">
-            <column name="id" type="BIGINT" autoIncrement="true">
+            <column name="id" type="BIGINT" defaultValueSequenceNext="flight_crew_SEQ">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="crew_name" type="VARCHAR(255)">
@@ -18,8 +21,7 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
-        <createSequence sequenceName="flight_SEQ" startValue="1" incrementBy="50"/>
-        <createSequence sequenceName="flight_crew_SEQ" startValue="1" incrementBy="50"/>
+
         <!-- Foreign key constraint ayrı olarak tanımlanır -->
         <addForeignKeyConstraint
                 baseTableName="flight_crew"
@@ -27,13 +29,5 @@
                 constraintName="fk_flight_crew_flight"
                 referencedTableName="flight"
                 referencedColumnNames="id"/>
-
-        <!-- Foreign key hatalı tanımlama
-
-        <column name="flight_id" type="BIGINT">
-            <constraints nullable="false" foreignKeyName="fk_flight_crew_flight" references="flight(id)"/>
-        </column>
-
-        -->
     </changeSet>
 </databaseChangeLog>

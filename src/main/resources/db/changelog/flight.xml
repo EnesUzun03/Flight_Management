@@ -6,8 +6,11 @@
     http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
     <changeSet id="1" author="enes">
+        <!-- Sequence oluştur -->
+        <createSequence sequenceName="flight_SEQ" startValue="1" incrementBy="1"/>
+        
         <createTable tableName="flight">
-            <column name="id" type="BIGINT" autoIncrement="true">
+            <column name="id" type="BIGINT" defaultValueSequenceNext="flight_SEQ">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="flight_number" type="VARCHAR(255)">
@@ -20,7 +23,5 @@
                 <constraints nullable="true"/>
             </column>
         </createTable>
-        <createSequence sequenceName="flight_SEQ" startValue="1" incrementBy="50"/>
-        <createSequence sequenceName="flight_crew_SEQ" startValue="1" incrementBy="50"/>
     </changeSet>
 </databaseChangeLog>

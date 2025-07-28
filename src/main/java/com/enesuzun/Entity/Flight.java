@@ -14,6 +14,7 @@ import jakarta.persistence.Table;
 @Table(name = "flight")
 public class Flight extends PanacheEntity {
     
+    
     @Column(name = "flight_number")
     public String flightNumber;
     
@@ -26,7 +27,6 @@ public class Flight extends PanacheEntity {
     // Relationships
     @OneToMany(mappedBy = "flight")
     public List<FlightCrew> flightCrews;
-
 
     //getter-setter
     public String getFlightNumber(){
@@ -43,7 +43,6 @@ public class Flight extends PanacheEntity {
         return this.flightCrews;
     }
 
-
     public void setFlightNumber(String a){
         this.flightNumber=a;
     }
@@ -57,10 +56,4 @@ public class Flight extends PanacheEntity {
     public void setFlightCrews(List<FlightCrew> newflightCrews){
         this.flightCrews=newflightCrews;
     }
-
-
-
-
-
-
 }

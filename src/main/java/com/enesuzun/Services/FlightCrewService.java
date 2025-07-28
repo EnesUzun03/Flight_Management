@@ -9,6 +9,7 @@ import com.enesuzun.Repositories.FlightCrewRepository;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 
 @ApplicationScoped
 public class FlightCrewService {
@@ -16,6 +17,7 @@ public class FlightCrewService {
     FlightCrewRepository flightCrewRepository;
 
     // Yeni personel ekle
+    @Transactional
     public void addCrew(FlightCrew crew) {
         flightCrewRepository.persist(crew);
     }
@@ -46,11 +48,13 @@ public class FlightCrewService {
     }
 
     // Personel sil
+    @Transactional
     public boolean deleteCrewByName(String crewName) {
         return flightCrewRepository.deleteByCrewName(crewName);
     }
 
     // Personel güncelle (tüm alanlar)
+    @Transactional
     public boolean updateCrew(Long id, String crewName, CrewType crewType, Flight flight) {
         return flightCrewRepository.updateFlightCrew(id, crewName, crewType, flight);
     }

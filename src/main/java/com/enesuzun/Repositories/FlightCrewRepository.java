@@ -11,7 +11,7 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class FlightCrewRepository implements PanacheRepository<FlightCrew> {
-    // Özel sorgular ekleyebilirsin, örnek:
+    // PanacheRepository den extend ederek temel crud isşlemleri otomatik yapıldı
     public List<FlightCrew> findByCrewType(String crewType) {
         return list("crewType", crewType);
     }

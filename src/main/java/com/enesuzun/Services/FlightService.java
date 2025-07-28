@@ -12,6 +12,7 @@ import com.enesuzun.Repositories.FlightRepository;
 
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
+import jakarta.transaction.Transactional;
 
 @ApplicationScoped
 public class FlightService {
@@ -20,13 +21,18 @@ public class FlightService {
 
     @Inject
     FlightCrewRepository flightCrewRepository;
+    
+    @Inject
+    FlightCrewService flightCrewService;
 
     //uçuş ekle
+    @Transactional
     public void addFlight(Flight flight){
         flightRepository.persist(flight);
     }
 
     //Özelliklerle uçuş nesnesi ekleme
+    @Transactional
     public void addFlight(String flightNumber,LocalTime departureTime,LocalDate departureDate,List<FlightCrew> flightCrews){
        Flight flight =new Flight();
        flight.setFlightNumber(flightNumber);
@@ -38,6 +44,7 @@ public class FlightService {
 
     }
     //UPDATE
+    @Transactional
     public void updateFlight(Long id, String newFlightNumber, LocalTime newDepartureTime, LocalDate newDepartureDate) {
         Flight flight = flightRepository.findById(id);
         if (flight != null) {
@@ -59,34 +66,47 @@ public class FlightService {
     }
 
     //id ile uçuş sil
+    @Transactional
     public void deleteFlight(Long id) {
         flightRepository.deleteById(id);
     }
 
-    //Uçuş ile uçuşun numarasunu bulma
-    public Flight findByFlightNumber(Flight flight){
-        return flightRepository.findByFlightNumber(flight.flightNumber);
+    //Uçuş no ile uçuşu bulma
+    public Flight findByFlightNumber(String flightNumber){
+        return flightRepository.findByFlightNumber(flightNumber);
     }
 
-    //Uçuş ile uçuşun numarasunu bulma
-    public LocalTime findByFlightDepartureTime(Flight flight){
-        return flightRepository.findByFlightDepartureTime(flight.flightNumber);
+    //Uçuş numarası ile uçuşun LocalTime bulma
+    public LocalTime findByFlightDepartureTime(String flightNumber){
+        return flightRepository.findByFlightDepartureTime(flightNumber);
     }
-    //uçuş nesnesinin Dateini bulma
-    public LocalDate findByFlightDepartureDate(Flight flight) {
-        return flightRepository.findByFlightDepartureDate(flight.flightNumber);
+    //uçuş numarası ile uçuşun LocalDateini bulma
+    public LocalDate findByFlightDepartureDate(String flightNumber) {
+        return flightRepository.findByFlightDepartureDate(flightNumber);
     }
+    
     //uçuştaki personel listesini bulma
     public List<FlightCrew> findByFlightCrewList(Flight flight){
         return flightRepository.findByFlightCrewList(flight.flightNumber);
     }
 
     // Flight entity'sine crew ekle
+    @Transactional
     public void addCrewToFlight(Long flightId, FlightCrew crew) {
         Flight flight = flightRepository.findById(flightId);
-        if (flight != null) {
+        /*if (flight != null) {
             crew.flight = flight;
             flightCrewRepository.persist(crew);
+        }
+        */
+        if (flight != null) {
+            // Yeni bir FlightCrew nesnesi oluştur
+            FlightCrew newCrew = new FlightCrew();
+            newCrew.crewName = crew.crewName;
+            newCrew.crewType = crew.crewType;
+            newCrew.flight = flight;
+            
+            flightCrewRepository.persist(newCrew);
         }
     }
 }
