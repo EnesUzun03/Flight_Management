@@ -16,7 +16,7 @@
             <column name="crew_name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="crew_type" type="VARCHAR(255)"/>
+            <column name="crew_type" type="VARCHAR(255)"/><!--crew_type: Enum değerleri string olarak saklanır ("PILOT", "COPILOT", "CABIN_CREW")-->
             <column name="flight_id" type="BIGINT">
                 <constraints nullable="false"/>
             </column>
@@ -28,6 +28,6 @@
                 baseColumnNames="flight_id"
                 constraintName="fk_flight_crew_flight"
                 referencedTableName="flight"
-                referencedColumnNames="id"/>
+                referencedColumnNames="id"/><!--constraintName="fk_flight_crew_flight"  kısıtlamaya verilen özel ad. Veritabanında constraint ismi olarak geçer-->
     </changeSet>
 </databaseChangeLog>

@@ -1,5 +1,9 @@
 package com.enesuzun.Controllers;
-
+/*
+ * Bu dosyalar REST API Controller sınıflarıdır ve 
+ * JAX-RS (Java API for RESTful Web Services) standardını kullanır.
+ *  Presentation Layer'ın (Sunum Katmanı) bir parçası olarak HTTP isteklerini karşılar ve JSON formatında yanıt döner. 
+ */
 import java.util.List;
 
 import com.enesuzun.Entity.CrewType;

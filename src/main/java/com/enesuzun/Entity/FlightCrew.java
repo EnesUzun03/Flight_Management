@@ -27,12 +27,12 @@ public class FlightCrew extends PanacheEntityBase {
     @Column(name = "crew_name", nullable = false)
     public String crewName;
     
-    @Enumerated(EnumType.STRING)
+    @Enumerated(EnumType.STRING)//Enum değerleri string olarak vt de tutulur
     @Column(name = "crew_type")
     public CrewType crewType;  //PILOT,COPILOT,CABIN_CREW gibi personel tipi
 
-    @ManyToOne
-    @JoinColumn(name = "flight_id", nullable = false)
+    @ManyToOne// Birden fazla crew üyesi aynı uçuşa atanabilir
+    @JoinColumn(name = "flight_id", nullable = false)//@JoinColumn(name = "flight_id"): Foreign key sütunu Flight tablosundaki id sutunu ile bağlanır
     @JsonBackReference
     public Flight flight;
 }

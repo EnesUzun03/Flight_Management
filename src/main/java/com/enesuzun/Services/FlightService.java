@@ -16,6 +16,9 @@ import jakarta.transaction.Transactional;
 
 @ApplicationScoped
 public class FlightService {
+
+    //Birden fazla repository ve service inject edilir
+    //Bunun sebebi bir uçuş silineceği zamen ona bağlı olan personellerde silinir
     @Inject
     FlightRepository flightRepository;
 
@@ -51,7 +54,7 @@ public class FlightService {
             flight.flightNumber = newFlightNumber;
             flight.departureTime = newDepartureTime;
             flight.departureDate = newDepartureDate;
-            flightRepository.persist(flight); 
+            flightRepository.persist(flight); //Burada persist gereksizmiş JPA Dirty Checking ile otomatik güncelleme gerçekleşiyormuş
         }
     }
 
@@ -65,10 +68,11 @@ public class FlightService {
         return flightRepository.findById(id);
     }
 
+    //NOT:  Entity cascade kullanarak sadece flight silinebilir
     //id ile uçuş sil
     @Transactional
     public void deleteFlight(Long id) {
-        // Önce bu Flight'e bağlı tüm FlightCrew'ları sil
+        // Önce bu Flight'e bağlı tüm FlightCrew'ları sil bunun sebebi Foreign key constraint'i önlemek için sıralı silme yapıyoruz
         List<FlightCrew> crews = flightCrewRepository.findByFlightId(id);
         for (FlightCrew crew : crews) {
             flightCrewRepository.deleteById(crew.id);
@@ -101,11 +105,11 @@ public class FlightService {
     @Transactional
     public void addCrewToFlight(Long flightId, FlightCrew crew) {
         Flight flight = flightRepository.findById(flightId);
-        /*if (flight != null) {
+        if (flight != null) {
             crew.flight = flight;
             flightCrewRepository.persist(crew);
         }
-        */
+        /*
         if (flight != null) {
             // Yeni bir FlightCrew nesnesi oluştur
             FlightCrew newCrew = new FlightCrew();
@@ -114,6 +118,6 @@ public class FlightService {
             newCrew.flight = flight;
             
             flightCrewRepository.persist(newCrew);
-        }
+        }*/
     }
 }

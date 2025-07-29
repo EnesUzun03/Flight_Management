@@ -17,13 +17,14 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
+//Jpa entity classı olduğunu belitmek için kullanılır.
 @Entity
-@Table(name = "flight")
-public class Flight extends PanacheEntityBase {
-    
-    
+@Table(name = "flight")//Veri tabanında flight tablosu olacak.
+//PanacheEntity'den extend etmek yerine PanacheEntityBase'den extend etme sebebimiz id anotasyonunu kullanabilmek için böylelikle özel bir id alanı oluşturduk.
+public class Flight extends PanacheEntityBase {//PanacheEntityBase ile temel CRUD işlemleri hazır metodlar içeren bir sınıf
+    //liquibase ile oluşturulan sequence'i kendi id alanımız'a bağladık.
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "flight_seq")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "flight_seq")//GenerationType.SEQUENCE Veritabanı sequence kullanarak ID ürettik.
     @SequenceGenerator(name = "flight_seq", sequenceName = "flight_seq", allocationSize = 50)
     public Long id;
 
@@ -38,7 +39,9 @@ public class Flight extends PanacheEntityBase {
     public LocalDate departureDate;
     
     // Relationships
-    @OneToMany(mappedBy = "flight", cascade = CascadeType.ALL, orphanRemoval = true)
+    //bir uçuşun birden fazla personeli olabilir bu yüzden one to many ilişkisi kurduk.
+    //Flight'a göre maplendi yani flightCrew tablosunu  "flight" alanı bu ilişkiyi yönetir
+    @OneToMany(mappedBy = "flight", cascade = CascadeType.ALL, orphanRemoval = true)//cascade = CascadeType.ALL: Flight silindiğinde tüm crew kayıtları da silinir
     @JsonManagedReference
     public List<FlightCrew> flightCrews;
 

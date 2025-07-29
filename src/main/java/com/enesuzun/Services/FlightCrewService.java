@@ -1,5 +1,10 @@
 package com.enesuzun.Services;
-
+/*
+ * Bu dosyalar Service Layer (İş Mantığı Katmanı) sınıflarıdır.
+ *  Repository'lerden farklı olarak, business logic'i içerir ve transaction yönetimi yapar. 
+ * Service Layer Pattern uygulayarak, veri erişim katmanı ile presentation katmanı arasında köprü görevi görürler.
+ * 
+ */
 import java.util.List;
 
 import com.enesuzun.Entity.CrewType;
@@ -11,25 +16,27 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 
-@ApplicationScoped
+@ApplicationScoped//CDI ile yönetilen singleton bean
 public class FlightCrewService {
+    //Dependency Injection ile FlightCrewRepository'yi otomatik enjekte eder
     @Inject
     FlightCrewRepository flightCrewRepository;
 
     // Yeni personel ekle
-    @Transactional
+    @Transactional// Bu metod bir transaction içinde çalışır.Transactional başarısız olursa rollback işlemi yapılır
     public void addCrew(FlightCrew crew) {
         flightCrewRepository.persist(crew);
     }
 
     // Tüm personelleri getir
+    //Burada transactional kullanmama sebebimiz ise sadece veritabanından okuma işlemi olduğu için
     public List<FlightCrew> getAllCrews() {
         return flightCrewRepository.findAllCrews();
     }
 
     // ID ile personel getir
     public FlightCrew getCrewById(Long id) {
-        return flightCrewRepository.findById(id);
+        return flightCrewRepository.findById(id);//findById() Panache'nin arama metodu id=? şeklinde sorgu oluşturur
     }
 
     // İsme göre personel ara
@@ -49,7 +56,7 @@ public class FlightCrewService {
 
     // Personel sil
     @Transactional
-    public boolean deleteCrewByName(String crewName) {
+    public boolean deleteCrewByName(String crewName) {//Silme işleminde transaction gereklidir.Veri tabaındaki herdegişikilikte transaction gereklidir
         return flightCrewRepository.deleteByCrewName(crewName);
     }
 
