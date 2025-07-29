@@ -1,5 +1,7 @@
 package com.enesuzun.Entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -22,7 +24,7 @@ public class FlightCrew extends PanacheEntityBase {
     @SequenceGenerator(name = "flight_crew_seq", sequenceName = "flight_crew_seq", allocationSize = 50)
     public Long id;
     
-    @Column(name = "crew_name")
+    @Column(name = "crew_name", nullable = false)
     public String crewName;
     
     @Enumerated(EnumType.STRING)
@@ -30,6 +32,7 @@ public class FlightCrew extends PanacheEntityBase {
     public CrewType crewType;  //PILOT,COPILOT,CABIN_CREW gibi personel tipi
 
     @ManyToOne
-    @JoinColumn(name = "flight_id")
+    @JoinColumn(name = "flight_id", nullable = false)
+    @JsonBackReference
     public Flight flight;
 }

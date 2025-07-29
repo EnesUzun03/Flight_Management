@@ -4,6 +4,8 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -26,7 +28,7 @@ public class Flight extends PanacheEntityBase {
     public Long id;
 
 
-    @Column(name = "flight_number")
+    @Column(name = "flight_number", nullable = false)
     public String flightNumber;
     
     @Column(name = "departure_time")
@@ -37,6 +39,7 @@ public class Flight extends PanacheEntityBase {
     
     // Relationships
     @OneToMany(mappedBy = "flight", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     public List<FlightCrew> flightCrews;
 
     //getter-setter
