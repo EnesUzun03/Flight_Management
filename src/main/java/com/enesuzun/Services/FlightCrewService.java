@@ -44,7 +44,7 @@ public class FlightCrewService {
 
     // Uçuştaki belirli tipteki personelleri getir
     public List<FlightCrew> getCrewsByFlightIdAndType(Long flightId, CrewType crewType) {
-        return flightCrewRepository.findByFlightIdAndCrewType(flightId, crewType.name());
+        return flightCrewRepository.findByFlightIdAndCrewType(flightId, crewType);
     }
 
     // Personel sil

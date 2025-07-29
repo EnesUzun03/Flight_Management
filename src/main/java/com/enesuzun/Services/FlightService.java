@@ -68,6 +68,13 @@ public class FlightService {
     //id ile uçuş sil
     @Transactional
     public void deleteFlight(Long id) {
+        // Önce bu Flight'e bağlı tüm FlightCrew'ları sil
+        List<FlightCrew> crews = flightCrewRepository.findByFlightId(id);
+        for (FlightCrew crew : crews) {
+            flightCrewRepository.deleteById(crew.id);
+        }
+        
+        // Sonra Flight'i sil
         flightRepository.deleteById(id);
     }
 

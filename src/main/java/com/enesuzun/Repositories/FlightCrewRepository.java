@@ -37,7 +37,7 @@ public class FlightCrewRepository implements PanacheRepository<FlightCrew> {
     }
 
     //Uçuştaki aranan tipteki personelleri çağırmak
-    public List<FlightCrew> findByFlightIdAndCrewType(Long flightId, String crewType) {
+    public List<FlightCrew> findByFlightIdAndCrewType(Long flightId, CrewType crewType) {
         return list("flight.id = ?1 and crewType = ?2", flightId, crewType);
     }
 

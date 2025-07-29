@@ -4,17 +4,28 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
-import io.quarkus.hibernate.orm.panache.PanacheEntity;
+import io.quarkus.hibernate.orm.panache.PanacheEntityBase;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "flight")
-public class Flight extends PanacheEntity {
+public class Flight extends PanacheEntityBase {
     
     
+    @Id
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "flight_seq")
+    @SequenceGenerator(name = "flight_seq", sequenceName = "flight_seq", allocationSize = 50)
+    public Long id;
+
+
     @Column(name = "flight_number")
     public String flightNumber;
     
@@ -25,7 +36,7 @@ public class Flight extends PanacheEntity {
     public LocalDate departureDate;
     
     // Relationships
-    @OneToMany(mappedBy = "flight")
+    @OneToMany(mappedBy = "flight", cascade = CascadeType.ALL, orphanRemoval = true)
     public List<FlightCrew> flightCrews;
 
     //getter-setter

@@ -6,11 +6,10 @@
     http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
     <changeSet id="1" author="enes">
-        <!-- Sequence oluştur -->
-        <createSequence sequenceName="flight_SEQ" startValue="1" incrementBy="1"/>
+        <createSequence sequenceName="flight_seq" startValue="1" incrementBy="50"/>
         
         <createTable tableName="flight">
-            <column name="id" type="BIGINT" defaultValueSequenceNext="flight_SEQ">
+            <column name="id" type="BIGINT" defaultValueSequenceNext="flight_seq">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="flight_number" type="VARCHAR(255)">
