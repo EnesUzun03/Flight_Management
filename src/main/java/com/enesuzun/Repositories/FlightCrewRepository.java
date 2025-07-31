@@ -16,6 +16,7 @@ public class FlightCrewRepository implements PanacheRepository<FlightCrew> {//Pa
         return list("crewType", crewType);//list() panache'den gelen bir metod."crewType", crewType: WHERE crewType = ? şeklinde sorgu oluşturur
     }
 
+
     // Kaydet
     public void save(FlightCrew crew) {
         persist(crew);//persist() JPA'dan gelen kayıt ışlemi yapan bir metod.

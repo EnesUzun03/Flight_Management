@@ -7,7 +7,7 @@
 
     <changeSet id="1" author="enes">
         <!-- Sequence oluştur.1'den başlar 50'şer artar.Flight entitydeki allocationSize ile aynı olmalıdır -->
-        <createSequence sequenceName="flight_seq" startValue="1" incrementBy="50"/>
+        <createSequence sequenceName="flight_seq" startValue="1" incrementBy="50"/><!--Burayı sor neden 50 olunca bazı satırlarda 51 -101 den başlıyor-->
         
         <createTable tableName="flight">
             <!--id sutununu oluşturduk ve sequence ile bağladık. defaultValueSequenceNext: her yeni kayıtta sequence'den sonraki değeri alacak-->

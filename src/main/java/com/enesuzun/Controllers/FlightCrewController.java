@@ -22,7 +22,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 
-@Path("/flight-crews")
+@Path("/flight-crews")//Base URL: /flight-crews
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class FlightCrewController {
@@ -65,7 +65,7 @@ public class FlightCrewController {
         if (updated) {
             return Response.ok().build();
         }
-        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();//Beklenmeyen hata durumunda 500 status döner
     }
 
     // Personel sil (isim ile)
@@ -74,7 +74,8 @@ public class FlightCrewController {
     public Response deleteCrewByName(@PathParam("crewName") String crewName) {
         boolean deleted = flightCrewService.deleteCrewByName(crewName);
         if (deleted) {
-            return Response.noContent().build();
+            //return Response.noContent().build();
+            return Response.ok(crewName + " silindi").build();//Silineniin verisini göstermek için deneme amaçlı yapıldı
         }
         return Response.status(Response.Status.NOT_FOUND).build();
     }
@@ -88,9 +89,9 @@ public class FlightCrewController {
 
     // Uçuştaki belirli tipteki personelleri getir
     @GET
-    @Path("/by-flight/{flightId}/by-type/{crewType}")
+    @Path("/by-flight/{flightId}/by-type/{crewType}")//Multiple path parameters: İki parametre birden
     public List<FlightCrew> getCrewsByFlightIdAndType(@PathParam("flightId") Long flightId, @PathParam("crewType") String crewType) {
-        return flightCrewService.getCrewsByFlightIdAndType(flightId, CrewType.valueOf(crewType));
+        return flightCrewService.getCrewsByFlightIdAndType(flightId, CrewType.valueOf(crewType));//CrewType.valueOf(): String'i enum'a dönüştürür
     }
 
     // İsme göre personel ara

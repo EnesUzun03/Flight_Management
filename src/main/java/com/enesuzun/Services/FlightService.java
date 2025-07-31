@@ -105,11 +105,14 @@ public class FlightService {
     @Transactional
     public void addCrewToFlight(Long flightId, FlightCrew crew) {
         Flight flight = flightRepository.findById(flightId);
+        //Burada bir hata var var olan crew'i değiştirirken 500 hatası alıyorum
+        //Burada parametre olan crewi direkt kullanmak yerine flightcrew repodaki findbyıd ile mi onun adresini mi kullanmam gerekli
+        /*
         if (flight != null) {
             crew.flight = flight;
             flightCrewRepository.persist(crew);
         }
-        /*
+        */
         if (flight != null) {
             // Yeni bir FlightCrew nesnesi oluştur
             FlightCrew newCrew = new FlightCrew();
@@ -118,6 +121,6 @@ public class FlightService {
             newCrew.flight = flight;
             
             flightCrewRepository.persist(newCrew);
-        }*/
+        }
     }
 }

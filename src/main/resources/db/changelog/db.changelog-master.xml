@@ -1,7 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <!--Liquibase adlı veritabanı migrasyon aracına ait konfigürasyon dosyalarıdır.-->
 <!--Bu dosya ana konfigürasyon dosyasıdır ve içine diğer dosyaları include eder.-->
 
-<?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
     xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"

@@ -51,7 +51,7 @@ public class Flight extends PanacheEntityBase {//PanacheEntityBase ile temel CRU
     }
     public LocalTime getDepartureTime(){
         return this.departureTime;
-    }
+    }//localdatetime lacak ayrı ayrı olmayacak
     public LocalDate getDepartureDate(){
         return this.departureDate;
     }
