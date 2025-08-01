@@ -1,7 +1,6 @@
 package com.enesuzun.Repositories;
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.enesuzun.Entity.Flight;
@@ -17,17 +16,12 @@ public class FlightRepository implements PanacheRepository<Flight> {
         return find("flightNumber", flightNumber).firstResult();//find() Panache'nin arama metodu flightnumber=? şeklinde sorgu oluşturur
     }
 
-    //Flight deperture_time
-    public LocalTime findByFlightDepartureTime(String flightNumber) {
-        return find("flightNumber", flightNumber).firstResult().departureTime;
-    }
-
-    //Flight deperture_date
-    public LocalDate findByFlightDepartureDate(String flightNumber) {
-        return find("flightNumber", flightNumber).firstResult().departureDate;
+    //Flight departure datetime
+    public LocalDateTime findByFlightDepartureDateTime(String flightNumber) {
+        return find("flightNumber", flightNumber).firstResult().getDepartureDateTime();
     }
     //Flight crew
     public List<FlightCrew> findByFlightCrewList(String flightNumber) {
-        return find("flightNumber", flightNumber).firstResult().flightCrews;
+        return find("flightNumber", flightNumber).firstResult().getFlightCrews();
     }
 }

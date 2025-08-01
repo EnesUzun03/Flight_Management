@@ -9,6 +9,8 @@ import java.util.List;
 import com.enesuzun.Entity.CrewType;
 import com.enesuzun.Entity.FlightCrew;
 import com.enesuzun.Services.FlightCrewService;
+import com.enesuzun.dto.FlightCrewDto;
+import com.enesuzun.mapper.FlightCrewMapper;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -28,11 +30,15 @@ import jakarta.ws.rs.core.Response;
 public class FlightCrewController {
     @Inject
     FlightCrewService flightCrewService;
+    
+    @Inject
+    FlightCrewMapper flightCrewMapper;
 
     // Tüm personelleri getir
     @GET
-    public List<FlightCrew> getAllCrews() {
-        return flightCrewService.getAllCrews();
+    public List<FlightCrewDto> getAllCrews() {
+        List<FlightCrew> crews = flightCrewService.getAllCrews();
+        return flightCrewMapper.toDtoList(crews);
     }
 
     // ID ile personel getir
@@ -41,27 +47,32 @@ public class FlightCrewController {
     public Response getCrewById(@PathParam("id") Long id) {
         FlightCrew crew = flightCrewService.getCrewById(id);
         if (crew != null) {
-            return Response.ok(crew).build();
+            FlightCrewDto crewDto = flightCrewMapper.toDto(crew);
+            return Response.ok(crewDto).build();
         }
         return Response.status(Response.Status.NOT_FOUND).build();
     }
 
     // Yeni personel ekle
     @POST
-    public Response addCrew(FlightCrew crew) {
+    public Response addCrew(FlightCrewDto crewDto) {
+        FlightCrew crew = flightCrewMapper.toEntity(crewDto);
         flightCrewService.addCrew(crew);
-        return Response.status(Response.Status.CREATED).entity(crew).build();
+        FlightCrewDto responseDto = flightCrewMapper.toDto(crew);
+        return Response.status(Response.Status.CREATED).entity(responseDto).build();
     }
 
     // Personel güncelle
     @PUT
     @Path("/{id}")
-    public Response updateCrew(@PathParam("id") Long id, FlightCrew updatedCrew) {
+    public Response updateCrew(@PathParam("id") Long id, FlightCrewDto updatedCrewDto) {
         FlightCrew existing = flightCrewService.getCrewById(id);
         if (existing == null) {
             return Response.status(Response.Status.NOT_FOUND).build();
         }
-        boolean updated = flightCrewService.updateCrew(id, updatedCrew.crewName, updatedCrew.crewType, updatedCrew.flight);
+        // DTO'dan Flight entity'sini almak için service'den flight'ı çekmemiz gerekecek
+        // Şimdilik basit approach kullanıyoruz - sadece temel alanları güncelliyoruz
+        boolean updated = flightCrewService.updateCrew(id, updatedCrewDto.getCrewName(), updatedCrewDto.getCrewType(), existing.getFlight());
         if (updated) {
             return Response.ok().build();
         }
@@ -83,22 +94,25 @@ public class FlightCrewController {
     // Uçuştaki tüm personelleri getir
     @GET
     @Path("/by-flight/{flightId}")
-    public List<FlightCrew> getCrewsByFlightId(@PathParam("flightId") Long flightId) {
-        return flightCrewService.getCrewsByFlightId(flightId);
+    public List<FlightCrewDto> getCrewsByFlightId(@PathParam("flightId") Long flightId) {
+        List<FlightCrew> crews = flightCrewService.getCrewsByFlightId(flightId);
+        return flightCrewMapper.toDtoList(crews);
     }
 
     // Uçuştaki belirli tipteki personelleri getir
     @GET
     @Path("/by-flight/{flightId}/by-type/{crewType}")//Multiple path parameters: İki parametre birden
-    public List<FlightCrew> getCrewsByFlightIdAndType(@PathParam("flightId") Long flightId, @PathParam("crewType") String crewType) {
-        return flightCrewService.getCrewsByFlightIdAndType(flightId, CrewType.valueOf(crewType));//CrewType.valueOf(): String'i enum'a dönüştürür
+    public List<FlightCrewDto> getCrewsByFlightIdAndType(@PathParam("flightId") Long flightId, @PathParam("crewType") String crewType) {
+        List<FlightCrew> crews = flightCrewService.getCrewsByFlightIdAndType(flightId, CrewType.valueOf(crewType));//CrewType.valueOf(): String'i enum'a dönüştürür
+        return flightCrewMapper.toDtoList(crews);
     }
 
     // İsme göre personel ara
     @GET
     @Path("/by-name/{crewName}")
-    public List<FlightCrew> getCrewsByName(@PathParam("crewName") String crewName) {
-        return flightCrewService.getCrewsByName(crewName);
+    public List<FlightCrewDto> getCrewsByName(@PathParam("crewName") String crewName) {
+        List<FlightCrew> crews = flightCrewService.getCrewsByName(crewName);
+        return flightCrewMapper.toDtoList(crews);
     }
 
     // Uçuştaki personel sayısı

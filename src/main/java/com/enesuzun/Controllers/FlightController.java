@@ -9,6 +9,10 @@ import java.util.List;
 import com.enesuzun.Entity.Flight;
 import com.enesuzun.Entity.FlightCrew;
 import com.enesuzun.Services.FlightService;
+import com.enesuzun.dto.FlightDto;
+import com.enesuzun.dto.FlightCrewDto;
+import com.enesuzun.mapper.FlightMapper;
+import com.enesuzun.mapper.FlightCrewMapper;
 
 import jakarta.inject.Inject;
 import jakarta.ws.rs.Consumes;
@@ -28,11 +32,18 @@ import jakarta.ws.rs.core.Response;
 public class FlightController {
     @Inject//Controller → Service → Repository katman yapısı.Business logic'i service katmanına delege eder
     FlightService flightService;
+    
+    @Inject
+    FlightMapper flightMapper;
+    
+    @Inject
+    FlightCrewMapper flightCrewMapper;
 
     // Tüm uçuşları getir
     @GET//URL : GET /flights
-    public List<Flight> getAllFlights() {
-        return flightService.getAllFlights();//Cevao json formatındaki tüm uçuşlardır
+    public List<FlightDto> getAllFlights() {
+        List<Flight> flights = flightService.getAllFlights();
+        return flightMapper.toDtoList(flights);//Entity'leri DTO'lara dönüştürür
     }
 
     // ID ile uçuş getir
@@ -41,27 +52,30 @@ public class FlightController {
     public Response getFlightById(@PathParam("id") Long id) {//@PathParam("id"): URL'deki {id}'yi metod parametresine bind eder.(bind etmek bağlamak anlammında kullanılıyor)
         Flight flight = flightService.getFlightById(id);
         if (flight != null) {
-            return Response.ok(flight).build();//Response.ok http 200
+            FlightDto flightDto = flightMapper.toDto(flight);
+            return Response.ok(flightDto).build();//Response.ok http 200
         }
         return Response.status(Response.Status.NOT_FOUND).build();
     }
 
     // Yeni uçuş ekle
     @POST
-    public Response addFlight(Flight flight) {
+    public Response addFlight(FlightDto flightDto) {
+        Flight flight = flightMapper.toEntity(flightDto);
         flightService.addFlight(flight);
-        return Response.status(Response.Status.CREATED).entity(flight).build();//entity(flight): Response body'ye Flight objesini ekler 
+        FlightDto responseDto = flightMapper.toDto(flight);
+        return Response.status(Response.Status.CREATED).entity(responseDto).build();//entity(flight): Response body'ye Flight objesini ekler 
     }
 
     // Uçuş güncelle
     @PUT
     @Path("/{id}")
-    public Response updateFlight(@PathParam("id") Long id, Flight updatedFlight) {
+    public Response updateFlight(@PathParam("id") Long id, FlightDto updatedFlightDto) {
         Flight existing = flightService.getFlightById(id);
         if (existing == null) {
             return Response.status(Response.Status.NOT_FOUND).build();//Response nesne yoksa not_Found döndürür
         }
-        flightService.updateFlight(id, updatedFlight.getFlightNumber(), updatedFlight.getDepartureTime(), updatedFlight.getDepartureDate());
+        flightService.updateFlight(id, updatedFlightDto.getFlightNumber(), updatedFlightDto.getDepartureDateTime());
         return Response.ok().build();
     }
 
@@ -80,8 +94,10 @@ public class FlightController {
     // Flight entity'sine crew ekle
     @POST
     @Path("/{flightId}/add-crew")//URL path'inde flightId parametresi (/flights/123/add-crew)
-    public Response addCrewToFlight(@PathParam("flightId") Long flightId, FlightCrew crew) {//@PathParam("flightId"): URL'deki {flightId}'yi metod parametresine bind eder.
+    public Response addCrewToFlight(@PathParam("flightId") Long flightId, FlightCrewDto crewDto) {//@PathParam("flightId"): URL'deki {flightId}'yi metod parametresine bind eder.
+        FlightCrew crew = flightCrewMapper.toEntity(crewDto);
         flightService.addCrewToFlight(flightId, crew);
-        return Response.status(Response.Status.CREATED).entity(crew).build();//entity(crew): Response body'ye FlightCrew objesini ekler
+        FlightCrewDto responseDto = flightCrewMapper.toDto(crew);
+        return Response.status(Response.Status.CREATED).entity(responseDto).build();//entity(crew): Response body'ye FlightCrew objesini ekler
     }
 }

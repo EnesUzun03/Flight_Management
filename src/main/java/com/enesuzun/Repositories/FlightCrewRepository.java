@@ -58,9 +58,9 @@ public class FlightCrewRepository implements PanacheRepository<FlightCrew> {//Pa
     public boolean updateFlightCrew(Long id, String crewName, CrewType crewType, Flight flight) {
         FlightCrew crew = findById(id);
         if (crew != null) {
-            crew.crewName = crewName;
-            crew.crewType = crewType;
-            crew.flight = flight;
+            crew.setCrewName(crewName);
+            crew.setCrewType(crewType);
+            crew.setFlight(flight);
             return true;
         }
         return false;

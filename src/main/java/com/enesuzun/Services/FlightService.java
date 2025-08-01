@@ -1,8 +1,7 @@
 package com.enesuzun.Services;
 
 
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import com.enesuzun.Entity.Flight;
@@ -36,11 +35,10 @@ public class FlightService {
 
     //Özelliklerle uçuş nesnesi ekleme
     @Transactional
-    public void addFlight(String flightNumber,LocalTime departureTime,LocalDate departureDate,List<FlightCrew> flightCrews){
+    public void addFlight(String flightNumber, LocalDateTime departureDateTime, List<FlightCrew> flightCrews){
        Flight flight =new Flight();
        flight.setFlightNumber(flightNumber);
-       flight.setDepartureTime(departureTime);
-       flight.setDepartureDate(departureDate);
+       flight.setDepartureDateTime(departureDateTime);
        flight.setFlightCrews(flightCrews);
 
        flightRepository.persist(flight);
@@ -48,12 +46,11 @@ public class FlightService {
     }
     //UPDATE
     @Transactional
-    public void updateFlight(Long id, String newFlightNumber, LocalTime newDepartureTime, LocalDate newDepartureDate) {
+    public void updateFlight(Long id, String newFlightNumber, LocalDateTime newDepartureDateTime) {
         Flight flight = flightRepository.findById(id);
         if (flight != null) {
-            flight.flightNumber = newFlightNumber;
-            flight.departureTime = newDepartureTime;
-            flight.departureDate = newDepartureDate;
+            flight.setFlightNumber(newFlightNumber);
+            flight.setDepartureDateTime(newDepartureDateTime);
             flightRepository.persist(flight); //Burada persist gereksizmiş JPA Dirty Checking ile otomatik güncelleme gerçekleşiyormuş
         }
     }
@@ -75,7 +72,7 @@ public class FlightService {
         // Önce bu Flight'e bağlı tüm FlightCrew'ları sil bunun sebebi Foreign key constraint'i önlemek için sıralı silme yapıyoruz
         List<FlightCrew> crews = flightCrewRepository.findByFlightId(id);
         for (FlightCrew crew : crews) {
-            flightCrewRepository.deleteById(crew.id);
+            flightCrewRepository.deleteById(crew.getId());
         }
         
         // Sonra Flight'i sil
@@ -87,18 +84,14 @@ public class FlightService {
         return flightRepository.findByFlightNumber(flightNumber);
     }
 
-    //Uçuş numarası ile uçuşun LocalTime bulma
-    public LocalTime findByFlightDepartureTime(String flightNumber){
-        return flightRepository.findByFlightDepartureTime(flightNumber);
-    }
-    //uçuş numarası ile uçuşun LocalDateini bulma
-    public LocalDate findByFlightDepartureDate(String flightNumber) {
-        return flightRepository.findByFlightDepartureDate(flightNumber);
+    //Uçuş numarası ile uçuşun LocalDateTime bulma
+    public LocalDateTime findByFlightDepartureDateTime(String flightNumber){
+        return flightRepository.findByFlightDepartureDateTime(flightNumber);
     }
     
     //uçuştaki personel listesini bulma
     public List<FlightCrew> findByFlightCrewList(Flight flight){
-        return flightRepository.findByFlightCrewList(flight.flightNumber);
+        return flightRepository.findByFlightCrewList(flight.getFlightNumber());
     }
 
     // Flight entity'sine crew ekle
@@ -116,9 +109,9 @@ public class FlightService {
         if (flight != null) {
             // Yeni bir FlightCrew nesnesi oluştur
             FlightCrew newCrew = new FlightCrew();
-            newCrew.crewName = crew.crewName;
-            newCrew.crewType = crew.crewType;
-            newCrew.flight = flight;
+            newCrew.setCrewName(crew.getCrewName());
+            newCrew.setCrewType(crew.getCrewType());
+            newCrew.setFlight(flight);
             
             flightCrewRepository.persist(newCrew);
         }

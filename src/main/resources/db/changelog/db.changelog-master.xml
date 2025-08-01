@@ -9,5 +9,6 @@
     http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.8.xsd">
 
     <include file="db/changelog/flight.xml"/>
+    <include file="db/changelog/flight-datetime-migration.xml"/>
     <include file="db/changelog/flightcrew.xml"/>
 </databaseChangeLog>
