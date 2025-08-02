@@ -17,10 +17,7 @@
             <column name="flight_number" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>
-            <column name="departure_time" type="TIME">
-                <constraints nullable="true"/>
-            </column>
-            <column name="departure_date" type="DATE">
+            <column name="departure_datetime" type="TIMESTAMP">
                 <constraints nullable="true"/>
             </column>
         </createTable>
