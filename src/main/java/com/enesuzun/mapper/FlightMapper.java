@@ -9,7 +9,7 @@ import org.mapstruct.MappingConstants;
 import com.enesuzun.Entity.Flight;
 import com.enesuzun.dto.FlightDto;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.CDI, uses = FlightCrewMapper.class)
+@Mapper(componentModel = MappingConstants.ComponentModel.JAKARTA_CDI, uses = FlightCrewMapper.class)
 public interface FlightMapper {
     
     /**
