@@ -27,5 +27,6 @@ public class FlightCrewDto {
     @Positive(message = "Uçuş ID'si pozitif bir sayı olmalıdır")
     private Long flightId; // Circular reference'ı önlemek için sadece Flight ID'sini tutuyoruz
     
-    private String flightNumber; // Ek bilgi olarak flight number'ı da ekleyebiliriz - validation gerekmez çünkü otomatik doldurulur
+    // Ek bilgi olarak flight number'ı da ekleyebiliriz - validation gerekmez çünkü otomatik doldurulur
+    private String flightNumber; 
 }

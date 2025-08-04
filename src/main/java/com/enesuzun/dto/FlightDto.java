@@ -26,6 +26,6 @@ public class FlightDto {
     @NotNull(message = "Kalkış tarihi ve saati belirtilmelidir")
     private LocalDateTime departureDateTime;
     
-    @Valid // Nested DTO validation
+    @Valid // Nested DTO validation - FlightCrewDto'nun Tüm anotasyonlarını kontrol eder
     private List<FlightCrewDto> flightCrews; // Nested DTO kullanarak circular reference'ı önlüyoruz
 }
