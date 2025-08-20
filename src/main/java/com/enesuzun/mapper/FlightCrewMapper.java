@@ -38,7 +38,10 @@ public abstract class FlightCrewMapper {
     
     /**
      * DTO → Entity dönüştürmeden sonra flight relationship'ini set et
-     * Bu method her toEntity() çağrısından sonra otomatik çalışır
+     * Bu method her toEntity() çağrısından sonra otomatik çalışır.
+     * Bunun sebebi ise döngüsel referanslamayı önlemek için.
+     * Entitye dönüştürürken flight alanını set etmek için kullanılır.
+     * Çünkü DTO kısmında fligth nesnesi olması yerine flightId var. (Bunu yapma sebebi de circular referanslamaı kırmak için)
      */
     @AfterMapping
     protected void setFlightRelationship(@MappingTarget FlightCrew flightCrew, FlightCrewDto dto) {

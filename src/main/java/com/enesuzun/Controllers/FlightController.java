@@ -13,6 +13,9 @@ import com.enesuzun.dto.FlightDto;
 import com.enesuzun.dto.FlightCrewDto;
 import com.enesuzun.mapper.FlightMapper;
 import com.enesuzun.mapper.FlightCrewMapper;
+import com.enesuzun.messaging.KafkaProducerService;
+import com.enesuzun.messaging.FlightMessage;
+import com.enesuzun.messaging.FlightCrewMessage;
 
 import jakarta.inject.Inject;
 import jakarta.validation.Valid;
@@ -41,6 +44,9 @@ public class FlightController {
     
     @Inject
     FlightCrewMapper flightCrewMapper;
+    
+    @Inject
+    KafkaProducerService kafkaProducerService;
 
     // Tüm uçuşları getir
     @GET//URL : GET /flights
@@ -80,27 +86,30 @@ public class FlightController {
         }
     }
 
-    // Yeni uçuş ekle
+    // Yeni uçuş ekle - Artık Kafka üzerinden asenkron
     @POST
     public Response addFlight(@Valid FlightDto flightDto) {
-        /* 
-        //Eski kod
-        Flight flight = flightMapper.toEntity(flightDto);
-        flightService.addFlight(flight);
-        FlightDto responseDto = flightMapper.toDto(flight);
-        return Response.status(Response.Status.CREATED).entity(responseDto).build();//entity(flight): Response body'ye Flight objesini ekler 
-        */
-        //try-catch bloklarına alındı
         try {
-            Flight flight = flightMapper.toEntity(flightDto);
-            flightService.addFlight(flight);
-            FlightDto responseDto = flightMapper.toDto(flight);
-            return Response.status(Response.Status.CREATED).entity(responseDto).build();
+            // Kafka'ya mesaj gönder (asenkron işlem)
+            FlightMessage flightMessage = FlightMessage.createMessage(
+                flightDto.getFlightNumber(), 
+                flightDto.getDepartureDateTime(), 
+                null // crew listesi ayrı mesajlarla gönderilecek
+            );
+            
+            kafkaProducerService.sendFlightMessage(flightMessage);
+            
+            // Başarılı yanıt döndür (Kafka'ya gönderildi, DB'ye kayıt asenkron olarak yapılacak)
+            return Response.status(Response.Status.ACCEPTED)
+                           .entity("Uçuş ekleme isteği başarıyla alındı. İşlem asenkron olarak gerçekleştirilecek.")
+                           .build();
+                           
         } catch (ConstraintViolationException e) {
             // Bean Validation hataları
             StringBuilder errorMessages = new StringBuilder("Validasyon hataları:\n");
+            //ConstraintViolation: Bean Validation'ın hatalarını temsil eder.
             for (ConstraintViolation<?> violation : e.getConstraintViolations()) {
-                errorMessages.append("- ").append(violation.getMessage()).append("\n");
+                errorMessages.append("- ").append(violation.getMessage()).append("\n");//violation.getMessage(): Hata mesajını döndürür.
             }
             return Response.status(Response.Status.BAD_REQUEST)
                            .entity(errorMessages.toString() + "\nGönderilen veri: " + flightDto.toString())
@@ -113,26 +122,37 @@ public class FlightController {
         } catch (Exception e) {
             // Beklenmeyen tüm hatalar
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                           .entity("Uçuş eklenirken bir hata oluştu: " + e.getMessage())
+                           .entity("Uçuş ekleme mesajı gönderilirken bir hata oluştu: " + e.getMessage())
                            .build();
         }
         }
 
-    // Uçuş güncelle
+    // Uçuş güncelle - Artık Kafka üzerinden asenkron
     @PUT
     @Path("/{id}")
     public Response updateFlight(@PathParam("id") Long id, @Valid FlightDto updatedFlightDto) {
         try {
-            FlightDto existingFlightDto = flightMapper.toDto(flightService.getFlightById(id));
-            if (existingFlightDto == null) {
+            // Önce uçuşun var olup olmadığını kontrol et
+            Flight existingFlight = flightService.getFlightById(id);
+            if (existingFlight == null) {
                 return Response.status(Response.Status.NOT_FOUND)
                    .entity("Bu '" + id + "' ye sahip uçuş bulunamadi")
                    .build();
             }
-            existingFlightDto.setFlightNumber(updatedFlightDto.getFlightNumber());
-            existingFlightDto.setDepartureDateTime(updatedFlightDto.getDepartureDateTime());
-            flightService.updateFlight(id, updatedFlightDto.getFlightNumber(), updatedFlightDto.getDepartureDateTime());
-            return Response.ok().build();
+            
+            // Kafka'ya güncelleme mesajı gönder
+            FlightMessage updateMessage = FlightMessage.updateMessage(
+                id, 
+                updatedFlightDto.getFlightNumber(), 
+                updatedFlightDto.getDepartureDateTime()
+            );
+            
+            kafkaProducerService.sendFlightMessage(updateMessage);
+            
+            return Response.status(Response.Status.ACCEPTED)
+                           .entity("Uçuş güncelleme isteği başarıyla alındı. İşlem asenkron olarak gerçekleştirilecek.")
+                           .build();
+                           
         } catch (ConstraintViolationException e) {
             // Bean Validation hataları
             StringBuilder errorMessages = new StringBuilder("Validasyon hataları:\n");
@@ -149,37 +169,31 @@ public class FlightController {
                     .build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                           .entity("Uçuş güncellenirken bir hata oluştu: " + e.getMessage())
+                           .entity("Uçuş güncelleme mesajı gönderilirken bir hata oluştu: " + e.getMessage())
                            .build();
         }
     }
-    // Uçuş sil
+    // Uçuş sil - Artık Kafka üzerinden asenkron
     @DELETE//Http delete isteği
     @Path("/{id}")
     public Response deleteFlight(@PathParam("id") Long id) {
-
-        /*
-        //Önceki silme kodu
-
-        Flight existing = flightService.getFlightById(id);
-        if (existing == null) {
-            return Response.status(Response.Status.NOT_FOUND).build();//Response nesne yoksa not_Found döndrğür
-        }
-        flightService.deleteFlight(id);
-        return Response.noContent().build();//içiboş body ve 200 status döner
-        */
-
-        try{FlightDto existingFlightDto = flightMapper.toDto(flightService.getFlightById(id));
-            if(existingFlightDto==null){
+        try {
+            // Önce uçuşun var olup olmadığını kontrol et
+            Flight existingFlight = flightService.getFlightById(id);
+            if(existingFlight == null){
                 return Response.status(Response.Status.NOT_FOUND)
                         .entity("Bu '" + id + "' ye sahip uçuş bulunamadi")
                         .build();
             }
-            Flight existingflight= flightMapper.toEntity(existingFlightDto);
-            flightService.deleteFlight(existingflight.getId());
+            
+            // Kafka'ya silme mesajı gönder
+            FlightMessage deleteMessage = FlightMessage.deleteMessage(id);
+            kafkaProducerService.sendFlightMessage(deleteMessage);
+            
             return Response.status(Response.Status.ACCEPTED)
-                    .entity("ID :"+id+", silme islemi basarili")
+                    .entity("Uçuş silme isteği başarıyla alındı. İşlem asenkron olarak gerçekleştirilecek.")
                     .build();
+                    
         }catch (IllegalArgumentException e) {
             //Validasyon hatası gibi durumlarda
             return Response.status(Response.Status.BAD_REQUEST)
@@ -191,22 +205,38 @@ public class FlightController {
                     .build();
         }catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                    .entity("Sunucu hatası: " + e.getMessage())
+                    .entity("Uçuş silme mesajı gönderilirken bir hata oluştu: " + e.getMessage())
                     .build();
         }
-
-
     }
 
-    // Flight entity'sine crew ekle
+    // Flight entity'sine crew ekle - Artık Kafka üzerinden asenkron
     @POST
     @Path("/{flightId}/add-crew")//URL path'inde flightId parametresi (/flights/123/add-crew)
     public Response addCrewToFlight(@PathParam("flightId") Long flightId, @Valid FlightCrewDto crewDto) {//@PathParam("flightId"): URL'deki {flightId}'yi metod parametresine bind eder.
         try {
-            FlightCrew crew = flightCrewMapper.toEntity(crewDto);
-            flightService.addCrewToFlight(flightId, crew);
-            FlightCrewDto responseDto = flightCrewMapper.toDto(crew);
-            return Response.status(Response.Status.CREATED).entity(responseDto).build();//entity(crew): Response body'ye FlightCrew objesini ekler
+            // Önce uçuşun var olup olmadığını kontrol et
+            Flight existingFlight = flightService.getFlightById(flightId);
+            if (existingFlight == null) {
+                return Response.status(Response.Status.NOT_FOUND)
+                               .entity("Bu '" + flightId + "' ID'ye sahip uçuş bulunamadı")
+                               .build();
+            }
+            
+            // Kafka'ya crew ekleme mesajı gönder
+            FlightCrewMessage crewMessage = FlightCrewMessage.createMessage(
+                crewDto.getCrewName(),
+                crewDto.getCrewType(),
+                flightId,
+                existingFlight.getFlightNumber()
+            );
+            
+            kafkaProducerService.sendCrewMessage(crewMessage);
+            
+            return Response.status(Response.Status.ACCEPTED)
+                           .entity("Personel ekleme isteği başarıyla alındı. İşlem asenkron olarak gerçekleştirilecek.")
+                           .build();
+                           
         } catch (ConstraintViolationException e) {
             // Bean Validation hataları
             StringBuilder errorMessages = new StringBuilder("Validasyon hataları:\n");
@@ -227,7 +257,7 @@ public class FlightController {
                     .build();
         } catch (Exception e) {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR)
-                           .entity("Personel eklenirken bir hata oluştu: " + e.getMessage())
+                           .entity("Personel ekleme mesajı gönderilirken bir hata oluştu: " + e.getMessage())
                            .build();
         }
     }

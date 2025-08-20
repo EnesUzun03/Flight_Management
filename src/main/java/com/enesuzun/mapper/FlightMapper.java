@@ -25,7 +25,7 @@ public interface FlightMapper {
      * DTO'dan Entity'ye dönüştürme
      * flightCrews alanı manuel olarak set edilmeli çünkü circular reference var
      */
-    @Mapping(target = "flightCrews", ignore = true)
+    @Mapping(target = "flightCrews", ignore = true)//flightCrew alanı göz ardı edilir.
     Flight toEntity(FlightDto flightDto);
     
     /**
